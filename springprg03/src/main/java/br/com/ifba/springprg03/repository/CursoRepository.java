@@ -8,6 +8,7 @@ package br.com.ifba.springprg03.repository;
 import br.com.ifba.springprg03.curso.entity.Curso;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 /**
  * Interface de Persistência (Repository) nativa do Spring Data JPA para a entidade Curso.
@@ -22,8 +23,12 @@ import org.springframework.stereotype.Repository;
 @Repository // Registra a interface como um componente de persistência no ecossistema IoC do Spring
 public interface CursoRepository extends JpaRepository<Curso, Long> {
     
-    // NENHUM MÉTODO PRECISA SER ESCRITO AQUI MANUALMENTE!
-    // Através da herança de JpaRepository, o Spring Boot injeta em tempo de execução
-    // métodos prontos como: save(), saveAll(), findById(), findAll(), delete(), entre outros.
-    
+    /**
+     * Busca cursos que contenham o nome informado, ignorando maiúsculas e minúsculas.
+     * QUERY METHOD: O Spring Data JPA interpreta o nome deste método e gera 
+     * automaticamente o JPQL correspondente: "SELECT c FROM Curso c WHERE LOWER(c.nome) LIKE LOWER(CONCAT('%', :nome, '%'))"
+     * @param nome Parte do nome do curso.
+     * @return Lista de cursos encontrados.
+     */
+    List<Curso> findByNomeContainingIgnoreCase(String nome);
 }

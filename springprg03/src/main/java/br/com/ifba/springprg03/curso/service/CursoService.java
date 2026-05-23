@@ -7,7 +7,7 @@ package br.com.ifba.springprg03.curso.service;
 
 import br.com.ifba.springprg03.curso.entity.Curso;
 import br.com.ifba.springprg03.infrastructure.util.StringUtil;
-import br.com.ifba.springprg03.repository.CursoIDao;
+import br.com.ifba.springprg03.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +23,13 @@ import java.util.List;
 @Transactional // Abre e gerencia automaticamente transações ACID do banco para todos os métodos de escrita
 public class CursoService implements CursoIService {
     
-    @Autowired // Injeta automaticamente a implementação do DAO de cursos (CursoDao)
-    private CursoIDao cursoDao;
+    /**
+     * Injeção do Repository do Spring Data. 
+     * Note que não precisamos de uma classe "CursoDaoImpl" física; o Spring 
+     * cria uma instância em memória que implementa CursoRepository.
+     */
+    @Autowired 
+    private CursoRepository cursoRepository;
     
     /**
      * Aplica regras de validação e insere um novo curso no banco de dados.
@@ -44,8 +49,12 @@ public class CursoService implements CursoIService {
             throw new RuntimeException("O nome do curso é obrigatório!");
         }
         
-        // Repassa os dados validados para a camada de persistência (DAO)
-        return cursoDao.save(curso); 
+        /** 
+         * PERSISTÊNCIA: O método save() do Spring Data JPA identifica se o objeto 
+         * é novo (ID nulo) para dar um persist(), ou existente (ID preenchido) 
+         * para dar um merge().
+         */
+        return cursoRepository.save(curso); 
     }
 
     /**
@@ -59,7 +68,12 @@ public class CursoService implements CursoIService {
         if (curso == null) {
             throw new RuntimeException("Objeto curso nulo!");
         }
-        return cursoDao.update(curso);
+        /**
+         * ATUALIZAÇÃO: Assim como no save(), o Spring Data JPA gerencia o estado 
+         * da entidade. Se o ID existir no banco, ele atualiza o registro com 
+         * os novos valores.
+         */
+        return cursoRepository.save(curso);
     }
 
     /**
@@ -72,7 +86,11 @@ public class CursoService implements CursoIService {
         if (curso == null) {
             throw new RuntimeException("Objeto curso nulo!");
         }
-        cursoDao.delete(curso);
+        /**
+         * REMOÇÃO: O repository cuida de garantir que a entidade esteja anexada 
+         * (managed) antes de tentar removê-la do banco de dados.
+         */
+        cursoRepository.delete(curso);
     }
 
     /**
@@ -81,7 +99,10 @@ public class CursoService implements CursoIService {
      */
     @Override
     public List<Curso> findAll() {
-        return cursoDao.findAll();
+        /**
+         * SELECT ALL: Retorna todos os registros da tabela curso mapeada pela entidade.
+         */
+        return cursoRepository.findAll();
     }
 
     /**
@@ -91,7 +112,12 @@ public class CursoService implements CursoIService {
      */
     @Override
     public Curso findById(Long id) {
-        return cursoDao.findById(id);
+        /**
+         * BUSCA POR ID: O Spring Data retorna um Optional<T>. 
+         * O uso de .orElse(null) é uma forma segura de lidar com IDs inexistentes, 
+         * mas você também poderia usar .orElseThrow(() -> new RuntimeException("Não encontrado")).
+         */
+        return cursoRepository.findById(id).orElse(null);
     }
 
     /**
@@ -101,6 +127,10 @@ public class CursoService implements CursoIService {
      */
     @Override
     public List<Curso> findByName(String name) {
-        return cursoDao.findByName(name);
+        /**
+         * BUSCA CUSTOMIZADA: Utiliza o método definido na interface Repository 
+         * que gera a consulta baseada no padrão Containing (LIKE %) e IgnoreCase.
+         */
+        return cursoRepository.findByNomeContainingIgnoreCase(name);
     }
 }
