@@ -18,6 +18,13 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- LOMBOK (Redução de código boilerplate) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- STARTER PARA JPA E BANCO DE DADOS -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

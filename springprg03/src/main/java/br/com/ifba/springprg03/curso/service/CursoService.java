@@ -8,7 +8,7 @@ package br.com.ifba.springprg03.curso.service;
 import br.com.ifba.springprg03.curso.entity.Curso;
 import br.com.ifba.springprg03.infrastructure.util.StringUtil;
 import br.com.ifba.springprg03.repository.CursoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -21,15 +21,14 @@ import java.util.List;
 
 @Service // Registra esta classe como um Bean de Serviço no contêiner IoC do Spring
 @Transactional // Abre e gerencia automaticamente transações ACID do banco para todos os métodos de escrita
+@RequiredArgsConstructor // Gera um construtor para todos os campos marcados como 'final', permitindo a Injeção de Dependência recomendada pelo Spring
 public class CursoService implements CursoIService {
     
     /**
      * Injeção do Repository do Spring Data. 
-     * Note que não precisamos de uma classe "CursoDaoImpl" física; o Spring 
-     * cria uma instância em memória que implementa CursoRepository.
+     * Utilizando injeção via construtor gerado pelo Lombok.
      */
-    @Autowired 
-    private CursoRepository cursoRepository;
+    private final CursoRepository cursoRepository;
     
     /**
      * Aplica regras de validação e insere um novo curso no banco de dados.
